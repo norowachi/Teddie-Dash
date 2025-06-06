@@ -4,8 +4,6 @@
   import { writable } from 'svelte/store';
   import type { PageProps } from './$types';
   import { page } from '$app/state';
-  import { replaceState } from '$app/navigation';
-  import { onMount, tick } from 'svelte';
 
   const { data }: PageProps = $props();
 
@@ -22,11 +20,11 @@
 
   const users = writable<typeof data.users>($list);
 
-  const guild_name = page.url.searchParams.get('gn') || '';
+  const guild_name = page.url.searchParams.get('gn');
 </script>
 
 <svelte:head>
-  <title>{guild_name} Leaderboard</title>
+  <title>{guild_name || 'Teddie'} Leaderboard</title>
 </svelte:head>
 
 <div class="p-4">
@@ -48,10 +46,13 @@
       bind:currentPage={$currentPage}
     />
   </div>
-  <div class="space-y-4">
+  <div class="space-y-2">
     <!-- Sort users by XP in descending order -->
     {#each $users as user, i (i)}
-      <div class="flex px-4 bg-gray-800 rounded-lg shadow-md pointer-events-none select-none">
+      <div
+        title="{user.xp} XP"
+        class="flex px-4 bg-gray-800 rounded-lg shadow-#a78b99 border-violet b-solid b-1px b-y-0 shadow-sm select-none"
+      >
         <div class="flex items-center justify-between pr-2 rounded-t-lg font-black">
           #{$list.indexOf(user) + 1}
         </div>
@@ -59,7 +60,7 @@
           <img
             src={user.avatar}
             alt="{user.username}'s avatar"
-            class="w-12 h-12 rounded-full mr-4"
+            class="w-12 h-12 rounded-full mr-4 pointer-events-none"
           />
           <div class="flex-1">
             <h2 class="text-lg font-semibold">{user.username}</h2>
