@@ -51,7 +51,10 @@
     {#each $users as user, i (i)}
       <div
         title="{user.xp} XP"
-        class="flex px-4 bg-gray-800 rounded-lg shadow-#a78b99 border-violet b-solid b-1px b-y-0 shadow-sm select-none"
+        class="flex px-4 rounded-lg shadow-#a78b99 border-violet b-solid b-1px b-y-0 shadow-sm select-none"
+        class:bg-gray-800={!user.hidden}
+        class:bg-gray-700={user.hidden}
+        class:opacity-80={user.hidden}
       >
         <div class="flex items-center justify-between pr-2 rounded-t-lg font-black">
           #{$list.indexOf(user) + 1}
