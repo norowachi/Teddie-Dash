@@ -65,7 +65,7 @@
         class:bg-gray-800={!user.hidden}
         class:bg-gray-700={user.hidden}
         class:opacity-80={user.hidden}
-        class:bg-violet-800={user.id === data.userSession?.user.id}
+        class:!bg-violet-800={user.id === data.userSession?.user.id}
       >
         <div class="flex items-center justify-between pr-2 rounded-t-lg font-black">
           #{($list?.indexOf(user) ?? 0) + 1}
