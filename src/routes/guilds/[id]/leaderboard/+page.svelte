@@ -1,10 +1,12 @@
 <script lang="ts">
+  export const prerender = true;
+  export const ssr = false;
+
   import { toAbbrev } from '$lib';
   import Pagination from '$lib/components/Pagination.svelte';
   import { writable } from 'svelte/store';
   import type { PageProps } from './$types';
   import DiscordIdentity from '$lib/components/DiscordIdentity.client.svelte';
-  import { userSession } from '$lib/store.svelte';
 
   const { data }: PageProps = $props();
 
@@ -14,7 +16,7 @@
 
   ShowAll.subscribe((value) => {
     list.set(
-      (value ? data.users : data.users.filter((user) => !user.hidden)).sort((a, b) => b.xp - a.xp)
+      (value ? data.users : data.users?.filter((user) => !user.hidden))?.sort((a, b) => b.xp - a.xp)
     );
     currentPage.set(0);
   });
@@ -28,12 +30,10 @@
 
 <div class="px-4">
   <h1 class="text-center text-2xl font-bold mb-4">{data.guildName} Leaderboard</h1>
-  {#if $userSession}
-    <DiscordIdentity
-      avatarUrl={$userSession?.user.avatarUrl}
-      username={$userSession?.user.username}
-    />
-  {/if}
+  <DiscordIdentity
+    avatarUrl={data.userSession?.user.avatarUrl}
+    username={data.userSession?.user.username}
+  />
   <div class="flex items-center mb-2">
     <label class="mr-2 text-sm" for="hide-checkbox">Show hidden users:</label>
     <input
@@ -53,7 +53,7 @@
   </div>
   <div class="space-y-2">
     <!-- Sort users by XP in descending order -->
-    {#each $users as user, i (i)}
+    {#each $users || [] as user, i (i)}
       <div
         title="{user.xp} XP"
         class="flex px-4 rounded-lg shadow-#a78b99 border-violet b-solid b-1px b-y-0 shadow-sm select-none"
@@ -62,7 +62,7 @@
         class:opacity-80={user.hidden}
       >
         <div class="flex items-center justify-between pr-2 rounded-t-lg font-black">
-          #{$list.indexOf(user) + 1}
+          #{$list?.indexOf(user)??0 + 1}
         </div>
         <div class="flex items-center w-full">
           <img

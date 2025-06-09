@@ -4,10 +4,10 @@
   const { avatarUrl, username } = $props();
 </script>
 
-<div class="flex justify-center items-middle">
-  <p class="flex text-md text-gray-400">
+<div class="flex justify-center">
+  <p class="flex items-center text-md text-gray-400">
     Signed in as
-    <img src={avatarUrl} alt="avatar" class="w-7 h-7 mx-2 rounded-full" loading="eager" />
+    <img src={avatarUrl} alt="avatar" class="w-7 mx-2 rounded-full" loading="eager" />
     <span class="text-white">{username}</span>
     <a
       href="/api/auth/discord/login?state={encodeURIComponent(page.url.pathname)}"

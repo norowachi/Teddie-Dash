@@ -1,5 +1,5 @@
 import { API_URL, PRIVATE_API_KEY } from '$env/static/private';
-import { loadUserGuilds, loadUserSession } from '$lib';
+import { loadUserSession } from '$lib';
 import { error, redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, fetch }) {
@@ -11,6 +11,4 @@ export async function load({ cookies, fetch }) {
   if (!DBresult) {
     return error(500, 'Failed to retrieve session from database');
   }
-
-  await loadUserGuilds(DBresult.accessToken, fetch);
 }

@@ -14,11 +14,11 @@
 
 <div
   class="w-full flex flex-col"
-  class:items-center={mounted}
-  class:justify-center={mounted}
-  class:overflow-hidden={mounted}
+  class:items-center={!mounted}
+  class:justify-center={!mounted}
+  class:overflow-hidden={!mounted}
 >
-  {#if mounted}
+  {#if !mounted}
     <svg
       aria-hidden="true"
       viewBox="0 0 100 101"

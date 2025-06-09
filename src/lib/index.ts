@@ -1,5 +1,3 @@
-import { userGuilds, userSession } from './store.svelte';
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function toAbbrev(num: any): string {
   if (!num || isNaN(num)) return '0';
@@ -44,7 +42,6 @@ export async function loadUserGuilds<
     ?.json()
     .catch(console.error);
 
-  if (guilds) userGuilds.set(guilds);
   return guilds;
 }
 
@@ -76,6 +73,5 @@ export async function loadUserSession<
     ?.json()
     .catch(console.error);
 
-  if (DBresult) userSession.set(DBresult);
   return DBresult;
 }

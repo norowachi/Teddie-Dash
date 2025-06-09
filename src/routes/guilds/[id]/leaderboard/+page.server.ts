@@ -1,22 +1,24 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { PRIVATE_API_KEY, API_URL } from '$env/static/private';
-import { userGuilds, userSession } from '$lib/store.svelte';
-import { get } from 'svelte/store';
-import { loadUserGuilds } from '$lib';
+import { loadUserGuilds, loadUserSession } from '$lib';
 
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, cookies, fetch }) => {
   // TODO
   let guildId = params.id;
   let guildName: string | undefined;
 
-  const accessToken = get(userSession)?.accessToken;
-  if (!accessToken) {
+  const sessionId = cookies.get('sessionId');
+  if (!sessionId) return;
+
+  const userSession = await loadUserSession({ API_URL, PRIVATE_API_KEY }, sessionId, fetch);
+  if (!userSession?.accessToken) {
     error(401, 'Unauthorized');
   }
+  const accessToken = userSession.accessToken;
 
   // get the user guilds from the store
-  let guilds = get(userGuilds);
+  let guilds = await loadUserGuilds(accessToken, fetch);
   // If the guild is not found, return error
   if (!guilds) {
     const loaded = await loadUserGuilds(accessToken, fetch);
@@ -75,7 +77,11 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
   // If the data is not found, return error
   if (!data) error(404, 'Not found');
 
-  return Object.assign(data, {
+  return {
+    users: data.users,
+    userSession,
+    userGuilds: guilds,
+    guildId,
     guildName
-  });
+  };
 };
