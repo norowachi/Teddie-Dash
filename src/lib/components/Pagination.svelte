@@ -27,7 +27,7 @@
   <button
     class="flex"
     onclick={() => (currentPage += 1)}
-    disabled={currentPage === totalPages - 1 ? true : false}
+    disabled={currentPage >= totalPages - 1 ? true : false}
     aria-label="right arrow icon"
     aria-describedby="next"
   >

@@ -1,7 +1,4 @@
 <script lang="ts">
-  export const prerender = true;
-  export const ssr = false;
-
   import { toAbbrev } from '$lib';
   import Pagination from '$lib/components/Pagination.svelte';
   import { writable } from 'svelte/store';
@@ -11,7 +8,7 @@
   const { data }: PageProps = $props();
 
   let ShowAll = writable(false);
-  let list = writable<typeof data.users>();
+  let list = writable<typeof data.users>([]);
   let currentPage = writable(0);
 
   ShowAll.subscribe((value) => {
@@ -22,6 +19,8 @@
   });
 
   const users = writable<typeof data.users>($list);
+
+  const currentUser = data.users?.find((u) => u.id === data.userSession?.user.id);
 </script>
 
 <svelte:head>
@@ -29,19 +28,25 @@
 </svelte:head>
 
 <div class="px-4">
-  <h1 class="text-center text-2xl font-bold mb-4">{data.guildName} Leaderboard</h1>
+  <h1 class="text-center text-2xl font-bold mb-2">{data.guildName} Leaderboard</h1>
   <DiscordIdentity
     avatarUrl={data.userSession?.user.avatarUrl}
     username={data.userSession?.user.username}
   />
-  <div class="flex items-center mb-2">
-    <label class="mr-2 text-sm" for="hide-checkbox">Show hidden users:</label>
-    <input
-      id="hide-checkbox"
-      type="checkbox"
-      bind:checked={$ShowAll}
-      class="h-4 w-4 border-gray-300 rounded-full"
-    />
+  <div class="flex justify-between items-center mb-2">
+    <div class="inline-flex items-center">
+      <label class="mr-2 text-sm" for="hide-checkbox">Show hidden users:</label>
+      <input id="hide-checkbox" type="checkbox" bind:checked={$ShowAll} class="h-4 w-4 m-0" />
+    </div>
+    {#if currentUser}
+      <span class="ml-2 text-sm">
+        Your Rank: {(data.users?.indexOf(currentUser) ?? 0) + 1}
+        {#if currentUser.hidden}
+          <br />
+          (Hidden)
+        {/if}
+      </span>
+    {/if}
   </div>
   <div class="mb-4">
     <Pagination
@@ -60,9 +65,10 @@
         class:bg-gray-800={!user.hidden}
         class:bg-gray-700={user.hidden}
         class:opacity-80={user.hidden}
+        class:bg-violet-800={user.id === data.userSession?.user.id}
       >
         <div class="flex items-center justify-between pr-2 rounded-t-lg font-black">
-          #{$list?.indexOf(user)??0 + 1}
+          #{($list?.indexOf(user) ?? 0) + 1}
         </div>
         <div class="flex items-center w-full">
           <img

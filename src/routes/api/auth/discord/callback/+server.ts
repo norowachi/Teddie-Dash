@@ -6,12 +6,11 @@ import {
 } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 
-export async function GET({ request, cookies }) {
-  const url = new URL(request.url);
+export async function GET({ cookies, url }) {
   const callback = decodeURIComponent(url.searchParams.get('state') || '/');
   const code = url.searchParams.get('code');
 
-  if (!code) return redirect(302, '/api/auth/discord/login');
+  if (!code) return redirect(302, '/api/auth/discord/login?state=' + encodeURIComponent(callback));
 
   const data:
     | {
@@ -36,7 +35,9 @@ export async function GET({ request, cookies }) {
     ?.json()
     .catch(console.error);
 
-  if (!data || !data.access_token) return redirect(302, '/api/auth/discord/login');
+  if (!data || !data.access_token)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return error(401, (data as any).error_description || 'Unauthorized');
 
   const user = await fetch('https://discord.com/api/v10/users/@me', {
     headers: {
@@ -68,10 +69,9 @@ export async function GET({ request, cookies }) {
         expires_in: data.expires_in,
         refresh_token: data.refresh_token
       })
+    }).catch((err) => {
+      console.error('Error storing token in database:', err);
     })
-      .catch((err) => {
-        console.error('Error storing token in database:', err);
-      })
   )
     ?.json()
     .catch(console.error);
@@ -81,22 +81,10 @@ export async function GET({ request, cookies }) {
   cookies.set('sessionId', DBresult.sessionId, {
     expires: new Date(Date.now() + data.expires_in * 1000),
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'none',
     secure: true,
     path: '/'
   });
-
-  cookies.set(
-    'user',
-    JSON.stringify({ id: user.id, username: user.username, avatar: user.avatar }),
-    {
-      expires: new Date(Date.now() + data.expires_in * 1000),
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: true,
-      path: '/'
-    }
-  );
 
   return redirect(302, callback || '/');
 }
