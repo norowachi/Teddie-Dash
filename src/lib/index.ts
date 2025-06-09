@@ -1,3 +1,5 @@
+import { userGuilds, userSession } from './store.svelte';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function toAbbrev(num: any): string {
   if (!num || isNaN(num)) return '0';
@@ -17,4 +19,63 @@ export function toAbbrev(num: any): string {
     }
   }
   return num;
+}
+
+export async function loadUserGuilds<
+  T extends
+    | Array<{
+        id: string;
+        name: string;
+        icon: string | null;
+        owner: boolean;
+        permissions: string;
+      }>
+    | undefined
+>(accessToken: string, fetch: typeof window.fetch = window.fetch): Promise<T> {
+  const guilds = await (
+    await fetch(`https://discord.com/api/v10/users/@me/guilds`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      }
+    }).catch(console.error)
+  )
+    ?.json()
+    .catch(console.error);
+
+  if (guilds) userGuilds.set(guilds);
+  return guilds;
+}
+
+export async function loadUserSession<
+  T extends
+    | {
+        user: {
+          id: string;
+          username: string;
+          avatarUrl: string;
+        };
+        accessToken: string;
+      }
+    | undefined
+>(
+  { API_URL, PRIVATE_API_KEY }: { [key: string]: string },
+  sessionId: string,
+  fetch: typeof window.fetch = window.fetch
+): Promise<T> {
+  const DBresult: T = await (
+    await fetch(`${API_URL}/auth/discord?sessionId=${sessionId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: PRIVATE_API_KEY
+      }
+    }).catch((err) => console.error('Error getting session from database:', err))
+  )
+    ?.json()
+    .catch(console.error);
+
+  if (DBresult) userSession.set(DBresult);
+  return DBresult;
 }

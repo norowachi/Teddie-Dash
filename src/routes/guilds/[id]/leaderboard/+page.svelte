@@ -1,9 +1,10 @@
 <script lang="ts">
   import { toAbbrev } from '$lib';
-  import Pagination from '$lib/Pagination.svelte';
+  import Pagination from '$lib/components/Pagination.svelte';
   import { writable } from 'svelte/store';
   import type { PageProps } from './$types';
-  import { page } from '$app/state';
+  import DiscordIdentity from '$lib/components/DiscordIdentity.client.svelte';
+  import { userSession } from '$lib/store.svelte';
 
   const { data }: PageProps = $props();
 
@@ -19,16 +20,20 @@
   });
 
   const users = writable<typeof data.users>($list);
-
-  const guild_name = page.url.searchParams.get('gn');
 </script>
 
 <svelte:head>
-  <title>{guild_name || 'Teddie'} Leaderboard</title>
+  <title>{data.guildName || 'Teddie'} Leaderboard</title>
 </svelte:head>
 
-<div class="p-4">
-  <h1 class="text-center text-2xl font-bold mb-4">{guild_name} Leaderboard</h1>
+<div class="px-4">
+  <h1 class="text-center text-2xl font-bold mb-4">{data.guildName} Leaderboard</h1>
+  {#if $userSession}
+    <DiscordIdentity
+      avatarUrl={$userSession?.user.avatarUrl}
+      username={$userSession?.user.username}
+    />
+  {/if}
   <div class="flex items-center mb-2">
     <label class="mr-2 text-sm" for="hide-checkbox">Show hidden users:</label>
     <input
