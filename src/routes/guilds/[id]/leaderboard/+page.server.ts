@@ -75,7 +75,7 @@ export const load: PageServerLoad = async ({ params, cookies, fetch }) => {
     .catch(console.error);
 
   // If the data is not found, return error
-  if (!data) error(404, 'Not found');
+  if (!data || !data.users.length) error(404, 'Not found');
 
   return {
     users: data.users,
