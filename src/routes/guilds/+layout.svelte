@@ -1,6 +1,5 @@
 <script lang="ts">
   import { cookieConsent, userGuilds, userSession } from '$lib/store.svelte.js';
-  import { onMount } from 'svelte';
   import type { LayoutProps } from './$types';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
@@ -8,13 +7,13 @@
 
   let { children, data }: LayoutProps = $props();
 
-  onMount(async () => {
-    if (!data.session) return;
+  if (data.session) {
     userSession.set(data.session);
-    if ($userGuilds) return;
-    const guilds = await loadUserGuilds(data.session.accessToken, fetch);
-    userGuilds.set(guilds);
-  });
+    if ($userGuilds) {
+      const guilds = await loadUserGuilds(data.session.accessToken, fetch);
+      userGuilds.set(guilds);
+    }
+  }
 </script>
 
 {#if $cookieConsent !== 1}
