@@ -19,6 +19,7 @@ export function toAbbrev(num: any): string {
   return num;
 }
 
+/** Could be used client-side */
 export async function loadUserGuilds<
   T extends
     | Array<{
@@ -43,35 +44,4 @@ export async function loadUserGuilds<
     .catch(console.error);
 
   return guilds;
-}
-
-export async function loadUserSession<
-  T extends
-    | {
-        user: {
-          id: string;
-          username: string;
-          avatarUrl: string;
-        };
-        accessToken: string;
-      }
-    | undefined
->(
-  { API_URL, PRIVATE_API_KEY }: { [key: string]: string },
-  sessionId: string,
-  fetch: typeof window.fetch = window.fetch
-): Promise<T> {
-  const DBresult: T = await (
-    await fetch(`${API_URL}/auth/discord?sessionId=${sessionId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: PRIVATE_API_KEY
-      }
-    }).catch((err) => console.error('Error getting session from database:', err))
-  )
-    ?.json()
-    .catch(console.error);
-
-  return DBresult;
 }

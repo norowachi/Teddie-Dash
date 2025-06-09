@@ -37,7 +37,7 @@ export async function GET({ cookies, url }) {
 
   if (!data || !data.access_token)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return error(401, (data as any).error_description || 'Unauthorized');
+    return error(401, 'Unauthorized|' + (data as any).error_description);
 
   const user = await fetch('https://discord.com/api/v10/users/@me', {
     headers: {
@@ -47,13 +47,7 @@ export async function GET({ cookies, url }) {
     .then((res) => res.json())
     .catch(console.error);
 
-  if (!user)
-    return new Response(
-      JSON.stringify({
-        message: 'Unauthorized'
-      }),
-      { status: 401 }
-    );
+  if (!user) return error(401, 'unauthorized');
 
   // store token in mongodb & store session id in cookies
   const DBresult: { sessionId: string } | undefined = await (
@@ -76,7 +70,7 @@ export async function GET({ cookies, url }) {
     ?.json()
     .catch(console.error);
 
-  if (!DBresult) error(500, 'Failed to store token in database');
+  if (!DBresult) error(500, 'Internal Server Error|Failed to store token in database');
 
   cookies.set('sessionId', DBresult.sessionId, {
     expires: new Date(Date.now() + data.expires_in * 1000),

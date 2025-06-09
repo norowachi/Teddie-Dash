@@ -1,16 +1,17 @@
-import { API_URL, PRIVATE_API_KEY } from '$env/static/private';
-import { loadUserSession } from '$lib';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-export async function load({ cookies, url, fetch }) {
+export async function load({ cookies, fetch }) {
   const sessionId = cookies.get('sessionId');
-  console.log('Session ID:', sessionId);
-  const callback = decodeURIComponent(url.searchParams.get('state') || '/');
-  if (!sessionId) redirect(303, '/api/auth/discord/login?state=' + encodeURIComponent(callback));
+  if (!sessionId) return { session: null };
 
-  const DBresult = await loadUserSession({ API_URL, PRIVATE_API_KEY }, sessionId, fetch);
+  const session: WebSession | undefined = await (await fetch('/api/session').catch(console.error))
+    ?.json()
+    .catch(console.error);
 
-  if (!DBresult) {
-    return error(500, 'Failed to retrieve session from database');
+  if (!session) {
+    return error(500, 'Internal Server Error|Failed to retrieve session from database');
   }
+
+
+  return { session };
 }

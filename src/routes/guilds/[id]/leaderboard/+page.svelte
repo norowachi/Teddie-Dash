@@ -1,15 +1,19 @@
 <script lang="ts">
-  import { toAbbrev } from '$lib';
+  import { loadUserGuilds, toAbbrev } from '$lib';
   import Pagination from '$lib/components/Pagination.svelte';
   import { writable } from 'svelte/store';
   import type { PageProps } from './$types';
   import DiscordIdentity from '$lib/components/DiscordIdentity.client.svelte';
+  import { userGuilds, userSession } from '$lib/store.svelte';
+  import { onMount } from 'svelte';
+  import { error } from '@sveltejs/kit';
 
   const { data }: PageProps = $props();
 
   let ShowAll = writable(false);
   let list = writable<typeof data.users>([]);
   let currentPage = writable(0);
+  let guildName = $state(data.guildName);
 
   ShowAll.subscribe((value) => {
     list.set(
@@ -20,18 +24,37 @@
 
   const users = writable<typeof data.users>($list);
 
-  const currentUser = data.users?.find((u) => u.id === data.userSession?.user.id);
+  const currentUser = data.users?.find((u) => u.id === $userSession?.user.id);
+
+  onMount(async () => {
+    if (!data.session) return error(404, 'Not Found');
+
+    // If the guild is not found, return error
+    if (!$userGuilds) {
+      const loaded = await loadUserGuilds(data.session.accessToken, fetch);
+      if (!loaded) return error(404, "Not Found|Couldn't find any guilds");
+      userGuilds.set(loaded);
+    }
+
+    const thisGuild = $userGuilds?.find((u) => u.id === data.guildId);
+    if (!thisGuild) {
+      // If the guild is not found in the user's guilds, return error
+      error(403, 'Forbidden|You are not a member of this guild');
+    }
+
+    guildName = thisGuild.name;
+  });
 </script>
 
 <svelte:head>
-  <title>{data.guildName || 'Teddie'} Leaderboard</title>
+  <title>{guildName || 'Teddie'} Leaderboard</title>
 </svelte:head>
 
 <div class="px-4">
-  <h1 class="text-center text-2xl font-bold mb-2">{data.guildName} Leaderboard</h1>
+  <h1 class="text-center text-2xl font-bold mb-2">{guildName} Leaderboard</h1>
   <DiscordIdentity
-    avatarUrl={data.userSession?.user.avatarUrl}
-    username={data.userSession?.user.username}
+    avatarUrl={$userSession?.user.avatarUrl}
+    username={$userSession?.user.username}
   />
   <div class="flex justify-between items-center mb-2">
     <div class="inline-flex items-center">
@@ -65,7 +88,7 @@
         class:bg-gray-800={!user.hidden}
         class:bg-gray-700={user.hidden}
         class:opacity-80={user.hidden}
-        class:!bg-violet-800={user.id === data.userSession?.user.id}
+        class:!bg-violet-800={user.id === $userSession?.user.id}
       >
         <div class="flex items-center justify-between pr-2 rounded-t-lg font-black">
           #{($list?.indexOf(user) ?? 0) + 1}

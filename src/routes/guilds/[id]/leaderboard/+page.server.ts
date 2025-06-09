@@ -1,32 +1,20 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { PRIVATE_API_KEY, API_URL } from '$env/static/private';
-import { loadUserGuilds, loadUserSession } from '$lib';
 
-export const load: PageServerLoad = async ({ params, cookies, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch }) => {
   // TODO
   let guildId = params.id;
   let guildName: string | undefined;
 
-  const sessionId = cookies.get('sessionId');
-  if (!sessionId) return;
-
-  const userSession = await loadUserSession({ API_URL, PRIVATE_API_KEY }, sessionId, fetch);
-  if (!userSession?.accessToken) {
+  const session: WebSession | undefined = await (await fetch('/api/session').catch(console.error))
+    ?.json()
+    .catch(console.error);
+  if (!session?.accessToken) {
     error(401, 'Unauthorized');
   }
-  const accessToken = userSession.accessToken;
+  const accessToken = session.accessToken;
 
-  // get the user guilds from the store
-  let guilds = await loadUserGuilds(accessToken, fetch);
-  // If the guild is not found, return error
-  if (!guilds) {
-    const loaded = await loadUserGuilds(accessToken, fetch);
-    if (!loaded) return error(404, 'No guilds found');
-    guilds = loaded;
-  }
-
-  // check if guild is an invite link if its not a number
   if (isNaN(Number(guildId))) {
     const result: { guild: { id: string; name: string } } | undefined = await (
       await fetch(`https://discord.com/api/v10/invites/${guildId}`, {
@@ -43,14 +31,6 @@ export const load: PageServerLoad = async ({ params, cookies, fetch }) => {
 
     guildName = result.guild.name;
     guildId = result.guild.id;
-
-    if (!guilds.find((u) => u.id === guildId)) {
-      // If the guild is not found in the user's guilds, return error
-      error(401, 'Unauthorized|You are not a member of this guild');
-    }
-  } else {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    guildName = guilds.find((u: any) => u.id === guildId)?.name;
   }
 
   const data: {
@@ -79,8 +59,6 @@ export const load: PageServerLoad = async ({ params, cookies, fetch }) => {
 
   return {
     users: data.users,
-    userSession,
-    userGuilds: guilds,
     guildId,
     guildName
   };

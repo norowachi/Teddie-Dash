@@ -1,30 +1,39 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import '../app.scss';
+  import CookieBanner from '$lib/components/CookieBanner.client.svelte';
+  import { cookieConsent, userSession } from '$lib/store.svelte';
+  import DiscordLogin from '$lib/components/nav/DiscordLogin.client.svelte';
 
   let { children } = $props();
 
-  let mounted = $state(false);
+  let IsMounted = $state(false);
 
   onMount(() => {
-    console.log('Layout mounted');
-    mounted = true;
+    IsMounted = true;
+
+    cookieConsent.subscribe((value) => {
+      if (value === 0) localStorage.removeItem('cookieConsent');
+      if (value === 1) localStorage.setItem('cookieConsent', 'accepted');
+      if (value === 2) localStorage.setItem('cookieConsent', 'rejected');
+      return;
+    });
   });
 </script>
 
 <div
-  class="w-full flex flex-col"
-  class:items-center={!mounted}
-  class:justify-center={!mounted}
-  class:overflow-hidden={!mounted}
+  class="w-full h-screen flex flex-col"
+  class:items-center={!IsMounted}
+  class:justify-center={!IsMounted}
+  class:overflow-hidden={!IsMounted}
 >
-  {#if !mounted}
+  {#if !IsMounted}
     <svg
       aria-hidden="true"
       viewBox="0 0 100 101"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      class="w-32 h-screen text-gray-200 animate-spin fill-blue-600"
+      class="w-32 h-full text-gray-200 animate-spin fill-blue-600"
     >
       <path
         d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
@@ -36,6 +45,10 @@
       />
     </svg>
   {:else}
+    {#if !$userSession?.user.id}
+      <DiscordLogin />
+    {/if}
+    <CookieBanner />
     {@render children()}
   {/if}
 </div>
