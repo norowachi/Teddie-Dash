@@ -1,13 +1,16 @@
 <script lang="ts">
   import { hasPermissions } from '$lib/functions/permissions';
-  import { userGuilds } from '$lib/store.svelte';
+
+  const { data } = $props();
 </script>
 
 <!-- TODO: filter guilds the bot is in and show them -->
-{#each ($userGuilds || [])
+{#each (data.guilds || [])
   .filter((g) => g.owner || hasPermissions( BigInt(g.permissions), ['ManageGuild', 'ManageMessages'] ))
   .sort((a, b) => Number(b.owner || hasPermissions( BigInt(b.permissions), ['ManageGuild', 'ManageMessages'] )) - Number(a.owner || hasPermissions( BigInt(a.permissions), ['ManageGuild', 'ManageMessages'] ))) as guild, i (guild.id)}
-  <div class="mx-20dvw flex items-center py-3 rounded-md hover:bg-dark transition-colors duration-200">
+  <div
+    class="md:mx-20dvw flex items-center py-3 rounded-md hover:bg-dark transition-colors duration-200"
+  >
     <a href="/guilds/{guild.id}" class="flex items-center gap-3 p-2 text-white decoration-none">
       <img
         src="https://cdn.discordapp.com/icons/{guild.id}/{guild.icon}.webp"
@@ -31,7 +34,7 @@
       {/if}
     </div>
   </div>
-  {#if ($userGuilds?.length ?? 0) !== i + 1}
-    <hr class="w-60dvw" />
+  {#if (data.guilds?.length ?? 0) !== i + 1}
+    <hr class="w-full md:w-60dvw" />
   {/if}
 {/each}

@@ -1,3 +1,4 @@
+import { loadUserGuilds } from '$lib';
 import { error } from '@sveltejs/kit';
 
 export async function load({ cookies, fetch }) {
@@ -12,6 +13,7 @@ export async function load({ cookies, fetch }) {
     return error(500, 'Internal Server Error|Failed to retrieve session from database');
   }
 
+  const guilds = await loadUserGuilds(sessionId, fetch);
 
-  return { session };
+  return { session, guilds };
 }
