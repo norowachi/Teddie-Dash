@@ -7,8 +7,6 @@
 **/.classpath
 **/.dockerignore
 **/.env
-# ignore all except the one in the root dir
-!.env
 **/.git
 **/.gitignore
 **/.project

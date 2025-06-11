@@ -2,14 +2,12 @@ services:
   dashboard:
     image: ghcr.io/norowachi/teddie-dash:main
     container_name: 'teddie-dash'
+    env_file: .env
     environment:
       NODE_ENV: production
-    volumes:
-      - .env:/usr/src/app/.env:ro
-    command: node --env-file .env build
     ports:
       - 127.0.0.1:5179:3000
-    # restart: unless-stopped
+    restart: unless-stopped
   watchtower:
     image: containrrr/watchtower
     container_name: 'teddie-watchtower'
