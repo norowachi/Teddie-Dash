@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { PRIVATE_API_KEY, API_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
   // TODO
@@ -43,11 +43,11 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
       hidden: boolean;
     }>;
   } = await (
-    await fetch(`${API_URL}/${guildId}/leaderboard`, {
+    await fetch(`${env.API_URL}/${guildId}/leaderboard`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: PRIVATE_API_KEY
+        Authorization: env.PRIVATE_API_KEY
       }
     }).catch(console.error)
   )

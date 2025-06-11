@@ -1,9 +1,4 @@
-import {
-  DISCORD_CLIENT_ID,
-  DISCORD_CLIENT_SECRET,
-  API_URL,
-  PRIVATE_API_KEY
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { error, redirect } from '@sveltejs/kit';
 
 export async function GET({ cookies, url }) {
@@ -28,7 +23,7 @@ export async function GET({ cookies, url }) {
       }),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${btoa(`${DISCORD_CLIENT_ID}:${DISCORD_CLIENT_SECRET}`)}`
+        Authorization: `Basic ${btoa(`${env.DISCORD_CLIENT_ID}:${env.DISCORD_CLIENT_SECRET}`)}`
       }
     }).catch(console.error)
   )
@@ -51,11 +46,11 @@ export async function GET({ cookies, url }) {
 
   // store token in mongodb & store session id in cookies
   const DBresult: { sessionId: string } | undefined = await (
-    await fetch(`${API_URL}/auth/discord`, {
+    await fetch(`${env.API_URL}/auth/discord`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: PRIVATE_API_KEY
+        Authorization: env.PRIVATE_API_KEY
       },
       body: JSON.stringify({
         user,
