@@ -1,0 +1,14 @@
+services:
+  dashboard:
+    image: ghcr.io/norowachi/teddie-dash:main
+    container_name: 'teddie-dash'
+    environment:
+      NODE_ENV: production
+    ports:
+      - 127.0.0.1:5179:3000
+    restart: unless-stopped
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30

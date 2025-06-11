@@ -48,6 +48,7 @@
     {#if data.session?.user.id}
       <DiscordLogin />
     {/if}
+    sakjhksahfjkhsakjh fjksahkjhfksajhkjh fhsajkhfksajhfkjhsakjfhaksjhfkhsakjhfkjhkjsahkjfhksaj
     <CookieBanner />
     {@render children()}
   {/if}
