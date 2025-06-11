@@ -47,6 +47,9 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Copy the rest of the source files into the image.
 COPY . .
 
+# Create placeholder env file to avoid errors during build.
+RUN mv example.env .env
+
 # Run the build script.
 RUN pnpm run check
 RUN pnpm run build
@@ -69,6 +72,8 @@ COPY package.json .
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/build ./build
+
+COPY .env .
 
 # Expose the port that the application listens on.
 EXPOSE 3000

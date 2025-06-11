@@ -13,7 +13,10 @@ export async function load({ cookies, fetch }) {
     return error(500, 'Internal Server Error|Failed to retrieve session from database');
   }
 
-  const guilds = await loadUserGuilds(sessionId, fetch);
+  let guilds = await loadUserGuilds(session.accessToken, fetch);
+  if (!guilds || !guilds.length) {
+    guilds = [];
+  }
 
   return { session, guilds };
 }

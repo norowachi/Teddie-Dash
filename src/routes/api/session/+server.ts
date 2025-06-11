@@ -5,6 +5,8 @@ export async function GET({ cookies }) {
   const sessionId = cookies.get('sessionId');
   if (!sessionId) return error(400, 'Bad Request|No sessionId provided');
 
+  console.log(API_URL, PRIVATE_API_KEY);
+
   const SessionData: WebSession | undefined = await (
     await fetch(`${API_URL}/auth/discord?sessionId=${sessionId}`, {
       method: 'GET',
