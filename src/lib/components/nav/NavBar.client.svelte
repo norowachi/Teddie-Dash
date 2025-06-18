@@ -1,17 +1,19 @@
 <script lang="ts">
   import { page } from '$app/state';
+  import { cookieConsent } from '$lib/store.svelte';
+  import DiscordLogin from './DiscordLogin.client.svelte';
 </script>
 
 <nav class="bg-gray-700 text-white flex items-center justify-between px-4 py-0.5 h-35px">
-  {#if page.data.session?.user.username}
+  {#if $cookieConsent === 1 && page.data.session?.user.username}
     <p>
       Welcome,
       <strong>{page.data.session?.user.username}</strong>!
     </p>
     <a
       href={void 0}
-      onclick={() => {
-        fetch('/api/auth/discord/logout', {
+      onclick={async () => {
+        await fetch('/api/auth/discord/logout', {
           method: 'DELETE'
         });
         return location.reload();
@@ -21,9 +23,8 @@
       Logout
     </a>
   {:else}
-    <a
-      href="/api/auth/discord/login?state={encodeURIComponent(page.url.pathname)}"
-      class="ml-auto text-cyan hover:text-cyan-6 decoration-none hover:underline">Login</a
-    >
+    <div class="ml-auto">
+      <DiscordLogin />
+    </div>
   {/if}
 </nav>

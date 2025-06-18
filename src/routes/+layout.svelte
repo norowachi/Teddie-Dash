@@ -22,7 +22,7 @@
 </script>
 
 <div
-  class="w-full h-100dvh flex flex-col"
+  class="flex flex-col h-100dvh"
   class:items-center={!IsMounted}
   class:justify-center={!IsMounted}
   class:overflow-hidden={!IsMounted}
