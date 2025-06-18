@@ -1,2 +1,5 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<!-- links -->
+
+<div class="flex flex-col mt-5 ml-2 pl-2 b-l-solid b-coolgray rounded-sm space-y-3">
+  <a href="/guilds">Guilds</a>
+</div>

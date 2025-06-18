@@ -93,6 +93,10 @@
             src={user.avatar}
             alt="{user.username}'s avatar"
             class="w-12 h-12 rounded-full mr-4 pointer-events-none"
+            onerror={(e) => {
+              (e.currentTarget as HTMLImageElement).src =
+                'https://cdn.discordapp.com/embed/avatars/0.png';
+            }}
           />
           <div class="flex-1">
             <h2 class="text-lg font-semibold">{user.username}</h2>

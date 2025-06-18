@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import '../app.scss';
+  import { onMount } from 'svelte';
   import CookieBanner from '$lib/components/CookieBanner.client.svelte';
   import { cookieConsent } from '$lib/store.svelte';
-  import DiscordLogin from '$lib/components/nav/DiscordLogin.client.svelte';
+  import NavBar from '$lib/components/nav/NavBar.client.svelte';
 
   let { children, data } = $props();
 
@@ -45,10 +45,10 @@
       />
     </svg>
   {:else}
-    {#if data.session?.user.id}
-      <DiscordLogin />
-    {/if}
+    <NavBar />
     <CookieBanner />
-    {@render children()}
+    <section class="px-2">
+      {@render children()}
+    </section>
   {/if}
 </div>

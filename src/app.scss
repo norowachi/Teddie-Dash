@@ -4,3 +4,11 @@ body {
   font-family: 'Arial', sans-serif;
   margin: 0;
 }
+
+a {
+  color: #1e90ff;
+  &:hover {
+    color: #006aff;
+  }
+  text-decoration: underline;
+}

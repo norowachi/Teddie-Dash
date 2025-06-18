@@ -48,7 +48,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 COPY . .
 
 # Create placeholder env file to avoid errors during build.
-RUN mv example.env .env
+RUN mv -n example.env .env
 
 # Run the build script.
 RUN pnpm run check
