@@ -57,13 +57,18 @@
       <input id="hide-checkbox" type="checkbox" bind:checked={$ShowAll} class="h-4 w-4 m-0" />
     </div>
     {#if currentUser}
-      <span class="ml-2 text-sm">
-        Your Rank: {(data.users?.indexOf(currentUser) ?? 0) + 1}
+      <p class="flex flex-col ml-2 text-sm">
+        <span>
+          Actual Rank: #{(data.users?.indexOf(currentUser) ?? 0) + 1}
+        </span>
         {#if currentUser.hidden}
-          <br />
           (Hidden)
+        {:else}
+          <span>
+            Visible Rank: #{($list?.indexOf(currentUser) ?? 0) + 1}
+          </span>
         {/if}
-      </span>
+      </p>
     {/if}
   </div>
   <div class="mb-4">
@@ -74,7 +79,7 @@
       bind:currentPage={$currentPage}
     />
   </div>
-  <div class="space-y-2">
+  <div class="space-y-2 mb-10">
     <!-- Sort users by XP in descending order -->
     {#each $users || [] as user, i (i)}
       <div
@@ -95,7 +100,7 @@
             class="w-12 h-12 rounded-full mr-4 pointer-events-none"
             onerror={(e) => {
               (e.currentTarget as HTMLImageElement).src =
-                'https://cdn.discordapp.com/embed/avatars/0.png';
+                `https://cdn.discordapp.com/embed/avatars/${BigInt(user.id) % 5n}.png`;
             }}
           />
           <div class="flex-1">

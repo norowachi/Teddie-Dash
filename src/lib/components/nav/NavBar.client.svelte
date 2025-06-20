@@ -4,7 +4,7 @@
   import DiscordLogin from './DiscordLogin.client.svelte';
 </script>
 
-<nav class="bg-gray-700 text-white flex items-center justify-between px-4 py-0.5 h-35px">
+<nav class="bg-fuchsia-9 text-white flex items-center justify-between px-4 py-0.5 h-35px">
   {#if $cookieConsent === 1 && page.data.session?.user.username}
     <p>
       Welcome,
